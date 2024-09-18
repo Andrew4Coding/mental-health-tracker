@@ -13,6 +13,10 @@
 {% if not mood_entries %}
 <p>Belum ada data mood pada mental health tracker.</p>
 {% else %}
+<a href="{% url 'main:logout' %}">
+  <button>Logout</button>
+</a>
+<h5>Sesi terakhir login: {{ last_login }}</h5>
 <table>
   <tr>
     <th>Mood Name</th>
