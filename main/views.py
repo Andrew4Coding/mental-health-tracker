@@ -4,7 +4,7 @@ from django.shortcuts import render, redirect
 from main.forms import MoodEntryForm
 
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
-from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth import login, logout 
 from django.contrib.auth.decorators import login_required 
 
 from django.contrib import messages
@@ -14,6 +14,7 @@ from django.core import serializers
 
 from django.urls import reverse
 
+# CRUD LOGIC
 # Create your views here.
 @login_required(login_url='main:login')
 def show_main(request):
@@ -40,6 +41,29 @@ def create_mood_entry(request):
     context = {'form': form}
     return render(request, "create_mood_entry.html", context)
 
+def edit_mood(request, id):
+    # Get mood entry berdasarkan id
+    mood = MoodEntry.objects.get(pk = id)
+
+    # Set mood entry sebagai instance dari form
+    form = MoodEntryForm(request.POST or None, instance=mood)
+
+    if form.is_valid() and request.method == "POST":
+        # Simpan form dan kembali ke halaman awal
+        form.save()
+        return HttpResponseRedirect(reverse('main:show_main'))
+
+    context = {'form': form}
+    return render(request, "edit_mood.html", context)
+
+def delete_mood(request, id):
+    # Get mood berdasarkan id
+    mood = MoodEntry.objects.get(pk = id)
+    # Hapus mood
+    mood.delete()
+    # Kembali ke halaman awal
+    return HttpResponseRedirect(reverse('main:show_main'))
+
 def show_xml(_):
     data = MoodEntry.objects.all()
     return HttpResponse(serializers.serialize('xml', data), content_type='application/xml')
@@ -57,7 +81,6 @@ def show_json_by_id(_, id):
     return HttpResponse(serializers.serialize('json', data), content_type='application/json')
 
 
-
 # Authentication Views
 def register(request):
     form = UserCreationForm()
@@ -68,9 +91,9 @@ def register(request):
             form.save()
             messages.success(request, "User has been created")
             return redirect('main:login')
-    
+        
     context = {'form': form }
-    return render(request, 'register.html', context)
+    return render(request, 'auth/register.html', context)
 
 
 def login_user(request):
@@ -87,7 +110,7 @@ def login_user(request):
    else:
       form = AuthenticationForm(request)
    context = {'form': form}
-   return render(request, 'login.html', context)
+   return render(request, 'auth/login.html', context)
 
 def logout_user(request):
     logout(request)
