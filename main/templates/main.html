@@ -40,13 +40,11 @@
 		</button>
 	</div>
 	<div id="mood_entry_cards"></div>
-	...
 	<div
 		id="crudModal"
 		tabindex="-1"
 		aria-hidden="true"
-		class="hidden fixed inset-0 z-50 w-full flex items-center justify-center bg-gray-800 bg-opacity-50 overflow-x-hidden overflow-y-auto transition-opacity duration-300 ease-out"
-	>
+		class="hidden fixed inset-0 z-50 w-full flex items-center justify-center bg-gray-800 bg-opacity-50 overflow-x-hidden overflow-y-auto transition-opacity duration-300 ease-out">
 		<div
 			id="crudModalContent"
 			class="relative bg-white rounded-lg shadow-lg w-5/6 sm:w-3/4 md:w-1/2 lg:w-1/3 mx-4 sm:mx-0 transform scale-95 opacity-0 transition-transform transition-opacity duration-300 ease-out"
@@ -151,11 +149,15 @@
 </div>
 <script>
   function addMoodEntry() {
+	console.log(new FormData(document.querySelector('#moodEntryForm')))
     fetch("{% url 'main:add_mood_entry_ajax' %}", {
       method: "POST",
       body: new FormData(document.querySelector('#moodEntryForm')),
     })
-    .then(response => refreshMoodEntries())
+    .then(response => {
+		console.log(response)
+		 refreshMoodEntries()
+	})
 
     document.getElementById("moodEntryForm").reset(); 
     document.querySelector("[data-modal-toggle='crudModal']").click();
@@ -190,7 +192,6 @@
 			moodEntries.forEach((item) => {
         const mood = DOMPurify.sanitize(item.fields.mood);
         const feelings = DOMPurify.sanitize(item.fields.feelings);
-
 				htmlString += `
             <div class="relative break-inside-avoid">
                 <div class="absolute top-2 z-10 left-1/2 -translate-x-1/2 flex items-center -space-x-2">
@@ -260,6 +261,7 @@
 		document.getElementById("mood_entry_cards").className = classNameString;
 		document.getElementById("mood_entry_cards").innerHTML = htmlString;
 	}
+
 	refreshMoodEntries();
 
 	const modal = document.getElementById("crudModal");
@@ -290,8 +292,6 @@
 
 	document.getElementById("cancelButton").addEventListener("click", hideModal);
 	document.getElementById("closeModalBtn").addEventListener("click", hideModal);
-
-  document.getElementById("submitMoodEntry").onclick = addMoodEntry
-  
+	document.getElementById("submitMoodEntry").onclick = addMoodEntry
 </script>
 {% endblock content %}
