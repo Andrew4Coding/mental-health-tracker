@@ -76,7 +76,7 @@ def show_xml(request):
 
 def show_json(request):
     data = MoodEntry.objects.all()
-    # data = MoodEntry.objects.filter(user=request.user)
+    data = MoodEntry.objects.filter(user=request.user)
     return HttpResponse(serializers.serialize('json', data), content_type='application/json')
 
 def show_xml_by_id(_, id):
